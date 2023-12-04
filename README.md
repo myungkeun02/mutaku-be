@@ -71,3 +71,29 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## 디렉토리 구조
+
+mutaku/
+|-- src/
+| |-- auth/
+| | |-- auth.controller.ts
+| | |-- auth.service.ts
+| | |-- dto/
+| | |-- signUp.dto.ts
+| | |-- login.dto.ts
+|
+| |-- playlist/
+| | |-- playlist.controller.ts
+| | |-- playlist.service.ts
+| | |-- dto/
+| | |-- createPlaylist.dto.ts
+|
+| |-- user/
+| |-- user.controller.ts
+| |-- user.service.ts
+| |-- dto/
+| |-- createUser.dto.ts
+|
+|-- main.ts
+|-- app.module.ts
