@@ -3,10 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  ManyToMany,
-  JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Music } from './music.entity';
@@ -31,11 +30,6 @@ export class Playlist {
   @ManyToOne(() => User, (user) => user.playlists)
   user: User;
 
-  @ManyToMany(() => Music)
-  @JoinTable({
-    name: 'playlist_music',
-    joinColumn: { name: 'playlist_id', referencedColumnName: 'playlist_id' },
-    inverseJoinColumn: { name: 'music_id', referencedColumnName: 'music_id' },
-  })
+  @OneToMany(() => Music, (music) => music.playlist)
   musics: Music[];
 }

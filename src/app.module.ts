@@ -1,17 +1,15 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { GameRoomsController } from './game-rooms/game-rooms.controller';
-// import { GameRoomsModule } from './game-rooms/game-rooms.module';
+import { GameRoomsController } from './game-rooms/game-rooms.controller';
+import { GameRoomsModule } from './game-rooms/game-rooms.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 // import { GameController } from './game/game.controller';
 // import { GameService } from './game/game.service';
 // import { GameModule } from './game/game.module';
-// import { GameRoomsService } from './game-rooms/game-rooms.service';
 import { UsersModule } from './users/users.module';
-import { UsersService } from './users/users.service';
 import { AuthController } from './auth/auth.controller';
 import { UsersController } from './users/users.controller';
 import { jwtServiceStrategy } from './auth/strategies/jwt-service.strategy';
@@ -21,8 +19,9 @@ import { GameRoom } from './entities/gameRoom.entity';
 import { GameRound } from './entities/gameRound.entity';
 import { PlayerInRoom } from './entities/playerInRoom.entity';
 import { Playlist } from './entities/playList.entity';
-// import { PlayListsService } from './play-lists/play-lists.service';
-// import { PlaylistsModule } from './play-lists/play-lists.module';
+import { Music } from './entities/music.entity';
+import { PlaylistsModule } from './play-lists/play-lists.module';
+import { PlayListsController } from './play-lists/play-lists.controller';
 
 @Module({
   imports: [
@@ -42,12 +41,13 @@ import { Playlist } from './entities/playList.entity';
         GameRoom,
         GameRound,
         PlayerInRoom,
+        Music,
         Playlist,
       ],
       synchronize: true,
     }),
-    // PlaylistsModule,
-    // GameRoomsModule,
+    PlaylistsModule,
+    GameRoomsModule,
     // GameModule,
     AuthModule,
     UsersModule,
@@ -55,18 +55,11 @@ import { Playlist } from './entities/playList.entity';
   controllers: [
     AppController,
     AuthController,
-    // PlayListsService,
-    // GameRoomsController,
+    GameRoomsController,
+    PlayListsController,
     // GameController,
     UsersController,
   ],
-  providers: [
-    AppService,
-    // GameService,
-    // PlayListsService,
-    // GameRoomsService,
-    UsersService,
-    jwtServiceStrategy,
-  ],
+  providers: [AppService, jwtServiceStrategy],
 })
 export class AppModule {}

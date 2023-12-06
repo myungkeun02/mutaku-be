@@ -8,7 +8,7 @@ import { AddMusicDto } from './dto/add-music.dto';
 export class PlayListsController {
   constructor(private readonly playlistService: PlayListsService) {}
 
-  @Post()
+  @Post('create')
   createPlaylist(@Body() createPlaylistDto: CreatePlaylistDto) {
     return this.playlistService.createPlaylist(createPlaylistDto);
   }
@@ -26,7 +26,7 @@ export class PlayListsController {
     return this.playlistService.getMusicByPlaylistId(playlistId);
   }
 
-  @Get('public')
+  @Get('')
   getPublicPlaylists() {
     return this.playlistService.getPublicPlaylists();
   }

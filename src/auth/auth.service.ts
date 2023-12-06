@@ -98,8 +98,8 @@ export class AuthService {
       createdAt: user.created_at,
     };
 
-    return {
-      token: this.jwtService.sign(payload),
-    };
+    const token = this.jwtService.sign(payload);
+
+    return token;
   }
 }

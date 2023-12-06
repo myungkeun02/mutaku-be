@@ -1,3 +1,8 @@
+import { MaxPlayer } from 'src/entities/gameRoom.entity';
+
 export class CreateGameRoomDto {
-  // Define the fields needed for creating a game room
+  title: string;
+  maxPlayers: MaxPlayer;
+  is_public: boolean;
+  password: string;
 }

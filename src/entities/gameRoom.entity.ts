@@ -14,10 +14,27 @@ import { PlayerInRoom } from './playerInRoom.entity';
 import { GameRound } from './gameRound.entity';
 import { CorrectAnswerLog } from './correctAnswerLog.entity';
 
+export enum MaxPlayer {
+  FOUR = 4,
+  FIVE = 5,
+  SIX = 6,
+  SEVEN = 7,
+  EIGHT = 8,
+}
+
 @Entity()
 export class GameRoom {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  title: string;
+
+  @Column({
+    type: 'enum',
+    enum: MaxPlayer,
+  })
+  maxPlayers: MaxPlayer;
 
   @Column({ nullable: true })
   password: string;

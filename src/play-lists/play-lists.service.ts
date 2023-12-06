@@ -4,12 +4,16 @@ import { AddMusicDto } from './dto/add-music.dto';
 import { Playlist } from 'src/entities/playList.entity';
 import { Music } from 'src/entities/music.entity';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PlayListsService {
   constructor(
-    private readonly playlistRepo: Repository<Playlist>,
+    @InjectRepository(Music)
     private readonly musicRepo: Repository<Music>,
+
+    @InjectRepository(Playlist)
+    private readonly playlistRepo: Repository<Playlist>,
   ) {}
 
   async createPlaylist(createPlaylistDto: CreatePlaylistDto) {
@@ -67,6 +71,7 @@ export class PlayListsService {
     const playlists = await this.playlistRepo.find({
       where: { is_public: true },
     });
+    console.log(playlists);
     return playlists;
   }
 }

@@ -1,5 +1,5 @@
 export class CreatePlaylistDto {
-  readonly title: string;
-  readonly description: string;
-  readonly isPublic: boolean;
+  title: string;
+  description: string;
+  isPublic: boolean;
 }

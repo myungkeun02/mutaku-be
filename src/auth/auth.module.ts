@@ -16,14 +16,15 @@ import { User } from 'src/entities/user.entity';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET_KEY'),
         signOptions: { expiresIn: '1y' },
+        httpOnly: true,
       }),
       inject: [ConfigService],
     }),
     PassportModule.register({ session: false }),
     TypeOrmModule.forFeature([User]),
   ],
-  controllers: [AuthController],
+  controllers: [],
   providers: [AuthService, LocalServiceStrategy, jwtServiceStrategy],
-  exports: [TypeOrmModule.forFeature([User]), AuthService], // TypeOrmModule.forFeature([User])를 exports에 추가
+  exports: [AuthService, TypeOrmModule.forFeature([User])], // TypeOrmModule.forFeature([User])를 exports에 추가
 })
 export class AuthModule {}

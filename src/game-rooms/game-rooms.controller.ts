@@ -1,31 +1,32 @@
-// import { Controller, Post, Get, Body, Param } from '@nestjs/common';
-// import { GameRoomsService } from './game-rooms.service';
-// import { CreateGameRoomDto, JoinGameRoomDto } from './dto';
+import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { GameRoomsService } from './game-rooms.service';
+import { CreateGameRoomDto } from './dto/create-game-room.dto';
+import { JoinGameRoomDto } from './dto/join-game-room.dto';
 
-// @Controller('game-rooms')
-// export class GameRoomsController {
-//   constructor(private readonly gameRoomsService: GameRoomsService) {}
+@Controller('game-rooms')
+export class GameRoomsController {
+  constructor(private readonly gameRoomsService: GameRoomsService) {}
 
-//   @Post()
-//   async createGameRoom(@Body() createGameRoomDto: CreateGameRoomDto) {
-//     return this.gameRoomsService.createGameRoom(createGameRoomDto);
-//   }
+  @Post('create')
+  async createGameRoom(@Body() createGameRoomDto: CreateGameRoomDto) {
+    return this.gameRoomsService.createGameRoom(createGameRoomDto);
+  }
 
-//   @Get()
-//   async getGameRooms() {
-//     return this.gameRoomsService.getGameRooms();
-//   }
+  @Get()
+  async getGameRooms() {
+    return this.gameRoomsService.getGameRooms();
+  }
 
-//   @Post(':roomId/join')
-//   async joinGameRoom(
-//     @Param('roomId') roomId: number,
-//     @Body() joinGameRoomDto: JoinGameRoomDto,
-//   ) {
-//     return this.gameRoomsService.joinGameRoom(roomId, joinGameRoomDto);
-//   }
+  @Post(':roomId/join')
+  async joinGameRoom(
+    @Param('roomId') roomId: number,
+    @Body() joinGameRoomDto: JoinGameRoomDto,
+  ) {
+    return this.gameRoomsService.joinGameRoom(roomId, joinGameRoomDto);
+  }
 
-//   @Get(':roomId')
-//   async getGameRoomInfo(@Param('roomId') roomId: number) {
-//     return this.gameRoomsService.getGameRoomInfo(roomId);
-//   }
-// }
+  @Get(':roomId')
+  async getGameRoomInfo(@Param('roomId') roomId: number) {
+    return this.gameRoomsService.getGameRoomInfo(roomId);
+  }
+}
