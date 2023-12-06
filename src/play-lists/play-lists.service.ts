@@ -40,7 +40,7 @@ export class PlayListsService {
     });
 
     if (!playlist) {
-      throw new NotFoundException(`Playlist with id ${playlistId} not found`);
+      throw new NotFoundException('해당 플레이리스트가 존재하지않습니다.');
     }
 
     const music = this.musicRepo.create({
@@ -49,7 +49,7 @@ export class PlayListsService {
       youtube_link: addMusicDto.youtubeLink,
       playlist: playlist,
     });
-
+    console.log(music);
     await this.musicRepo.save(music);
   }
 

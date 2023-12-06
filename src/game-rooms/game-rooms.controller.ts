@@ -1,7 +1,6 @@
 import { Controller, Post, Get, Body, Param } from '@nestjs/common';
 import { GameRoomsService } from './game-rooms.service';
 import { CreateGameRoomDto } from './dto/create-game-room.dto';
-import { JoinGameRoomDto } from './dto/join-game-room.dto';
 
 @Controller('game-rooms')
 export class GameRoomsController {
@@ -15,14 +14,6 @@ export class GameRoomsController {
   @Get()
   async getGameRooms() {
     return this.gameRoomsService.getGameRooms();
-  }
-
-  @Post(':roomId/join')
-  async joinGameRoom(
-    @Param('roomId') roomId: number,
-    @Body() joinGameRoomDto: JoinGameRoomDto,
-  ) {
-    return this.gameRoomsService.joinGameRoom(roomId, joinGameRoomDto);
   }
 
   @Get(':roomId')

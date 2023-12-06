@@ -22,6 +22,9 @@ import { Playlist } from './entities/playList.entity';
 import { Music } from './entities/music.entity';
 import { PlaylistsModule } from './play-lists/play-lists.module';
 import { PlayListsController } from './play-lists/play-lists.controller';
+import { PlayerInRoomController } from './player-in-room/player-in-room.controller';
+import { PlayerInRoomService } from './player-in-room/player-in-room.service';
+import { PlayerInRoomModule } from './player-in-room/player-in-room.module';
 
 @Module({
   imports: [
@@ -51,6 +54,7 @@ import { PlayListsController } from './play-lists/play-lists.controller';
     // GameModule,
     AuthModule,
     UsersModule,
+    PlayerInRoomModule,
   ],
   controllers: [
     AppController,
@@ -59,7 +63,8 @@ import { PlayListsController } from './play-lists/play-lists.controller';
     PlayListsController,
     // GameController,
     UsersController,
+    PlayerInRoomController,
   ],
-  providers: [AppService, jwtServiceStrategy],
+  providers: [AppService, jwtServiceStrategy, PlayerInRoomService],
 })
 export class AppModule {}

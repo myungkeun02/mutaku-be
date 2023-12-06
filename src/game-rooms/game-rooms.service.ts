@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGameRoomDto } from './dto/create-game-room.dto';
-import { JoinGameRoomDto } from './dto/join-game-room.dto';
 import { Repository } from 'typeorm';
 import { GameRoom } from 'src/entities/gameRoom.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,16 +25,20 @@ export class GameRoomsService {
   }
 
   async getGameRooms() {
-    // TODO: Implement get game rooms logic
-  }
-
-  async joinGameRoom(roomId: number, joinGameRoomDto: JoinGameRoomDto) {
-    console.log(roomId, joinGameRoomDto);
-    // TODO: Implement join game room logic
+    const gameRooms = await this.gameRoomRepo.find({
+      where: {
+        is_public: true,
+      },
+    });
+    console.log(gameRooms);
+    return gameRooms;
   }
 
   async getGameRoomInfo(roomId: number) {
-    console.log(roomId);
-    // TODO: Implement get game room info logic
+    const gameRoomInfo = await this.gameRoomRepo.findOne({
+      where: { id: roomId },
+    });
+    console.log(gameRoomInfo);
+    return gameRoomInfo;
   }
 }
