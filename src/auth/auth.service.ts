@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -12,7 +13,7 @@ import { User } from 'src/entities/user.entity';
 import { QueryRunner, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { LocalServiceGuard } from './guards/local-service.guard';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 @Injectable()
 export class AuthService {
   authService: any;
@@ -126,19 +127,24 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     res.cookie('access-token', accessToken, { httpOnly: true });
+    res.cookie('refresh-token', refreshToken, { httpOnly: true });
+
     user.refresh_token = refreshToken;
     await this.userRepo.save(user);
     console.log(accessToken, refreshToken, user);
     return accessToken;
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<string> {
+  async refreshAccessToken(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<string> {
     try {
-      const decoded = this.jwtService.verify(refreshToken);
+      const user = await this.userRepo.findOne({
+        where: { refresh_token: req.cookies['refresh-token'] },
+      });
 
-      const user = await this.userRepo.findOne(decoded.id);
-
-      if (!user || user.refresh_token !== refreshToken) {
+      if (!user) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
@@ -149,21 +155,23 @@ export class AuthService {
         createdAt: user.created_at,
       };
 
-      const newAccessToken = this.jwtService.sign(payload, {
+      const newAccessToken = await this.jwtService.sign(payload, {
         expiresIn: '15m',
       });
+      res.cookie('access-token', newAccessToken, { httpOnly: true });
 
-      // Update the refresh token in the database (optional)
-      user.refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
+      const newRefreshToken = await this.jwtService.sign(payload, {
+        expiresIn: '7d',
+      });
+
+      res.cookie('refresh-token', newRefreshToken, { httpOnly: true });
+      user.refresh_token = newRefreshToken;
       await this.userRepo.save(user);
 
+      console.log(newAccessToken, newRefreshToken);
       return newAccessToken;
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 }
-
-// 1. accessToken 만료시 DB에 저장된 refreshtoken을 이용해 갱신
-// > accessToken를 쿠키에 저장하여 전송
-// > refreshToken을 db에 저장 -> 재 로그인시 refreshtoken 업데이트
