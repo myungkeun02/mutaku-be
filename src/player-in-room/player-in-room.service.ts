@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlayerInRoom } from 'src/entities/playerInRoom.entity';
-import { JoinGameRoomDto } from './dto/join-game-room.dto';
+import { JoinGameRoomDto } from 'src/game-rooms/dto/join-game-room.dto';
 
 @Injectable()
 export class PlayerInRoomService {

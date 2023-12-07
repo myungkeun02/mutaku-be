@@ -1,6 +1,6 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { PlayerInRoomService } from './player-in-room.service';
-import { JoinGameRoomDto } from './dto/join-game-room.dto';
+import { JoinGameRoomDto } from 'src/game-rooms/dto/join-game-room.dto';
 
 @Controller('player-in-room')
 export class PlayerInRoomController {

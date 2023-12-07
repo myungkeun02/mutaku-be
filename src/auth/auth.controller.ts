@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signUp.dto';
 import { LocalServiceGuard } from './guards/local-service.guard';
@@ -17,44 +17,19 @@ export class AuthController {
 
   @Post('signup')
   async signUp(@Body() signUpDto: SignupDto) {
-    const queryRunner =
-      this.userRepository.manager.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction('SERIALIZABLE');
-
     try {
-      await this.authService.checkDuplicateEmail(signUpDto.email, queryRunner);
-      await this.authService.checkDuplicateName(signUpDto.name, queryRunner);
-
-      const hashedPassword = await this.authService.hashPassword(
-        signUpDto.password,
-      );
-
-      signUpDto.password = hashedPassword;
-
-      // User 엔티티를 생성하고 저장
-      const user = this.userRepository.create({
-        name: signUpDto.name,
-        email: signUpDto.email,
-        password: hashedPassword,
-      });
-
-      return this.authService.signUp(user);
+      const savedUser = await this.authService.signUp(signUpDto);
+      return savedUser;
     } catch (error) {
-      // 롤백 처리
-      await queryRunner.rollbackTransaction();
-      throw error; // 에러를 다시 던져서 호출자에게 전달
-    } finally {
-      // 쿼리 러너 연결 해제
-      await queryRunner.release();
+      throw error;
     }
   }
 
   @UseGuards(LocalServiceGuard)
   @Post('login')
-  async login(@Req() req, @Body() loginDto: LoginDto) {
+  async login(@Req() req, @Body() loginDto: LoginDto, @Res() res) {
     try {
-      const _token = this.authService.login(req.user);
+      const _token = await this.authService.loginWithCreateToken(req.user, res);
       return { token: _token, dto: loginDto };
     } catch (error) {
       console.error(error);

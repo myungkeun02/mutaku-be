@@ -10,7 +10,7 @@ export class LocalServiceStrategy extends PassportStrategy(
 ) {
   constructor(private authService: AuthService) {
     super({
-      emailField: 'audrms3568@gmail.com',
+      emailField: 'email',
       passwordField: 'password',
     });
   }

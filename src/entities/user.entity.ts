@@ -47,4 +47,7 @@ export class User {
 
   @Column({ default: false })
   is_deleted: boolean;
+
+  @Column()
+  refresh_token: string;
 }

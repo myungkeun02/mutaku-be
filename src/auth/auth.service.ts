@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -11,9 +12,10 @@ import { User } from 'src/entities/user.entity';
 import { QueryRunner, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { LocalServiceGuard } from './guards/local-service.guard';
-
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
+  authService: any;
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
@@ -60,13 +62,35 @@ export class AuthService {
     }
   }
 
-  async signUp(signUpDto: SignupDto, queryRunner?: QueryRunner) {
-    try {
-      const manager = queryRunner ? queryRunner.manager : this.userRepo.manager;
+  async signUp(signUpDto: SignupDto): Promise<User> {
+    const queryRunner = this.userRepo.manager.connection.createQueryRunner();
 
-      return await manager.save(this.userRepo.create(signUpDto));
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction('SERIALIZABLE');
+
+      await this.checkDuplicateEmail(signUpDto.email, queryRunner);
+      await this.checkDuplicateName(signUpDto.name, queryRunner);
+
+      const hashedPassword = await this.hashPassword(signUpDto.password);
+      signUpDto.password = hashedPassword;
+
+      const user = this.userRepo.create({
+        name: signUpDto.name,
+        email: signUpDto.email,
+        password: hashedPassword,
+      });
+
+      const savedUser = await queryRunner.manager.save(user);
+
+      await queryRunner.commitTransaction();
+
+      return savedUser;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new BadRequestException('회원 가입 중 오류가 발생했습니다.');
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -90,7 +114,7 @@ export class AuthService {
   }
 
   @UseGuards(LocalServiceGuard)
-  login(user: User) {
+  async loginWithCreateToken(user: User, @Res() res: Response) {
     const payload = {
       id: user.id,
       email: user.email,
@@ -98,8 +122,48 @@ export class AuthService {
       createdAt: user.created_at,
     };
 
-    const token = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-    return token;
+    res.cookie('access-token', accessToken, { httpOnly: true });
+    user.refresh_token = refreshToken;
+    await this.userRepo.save(user);
+    console.log(accessToken, refreshToken, user);
+    return accessToken;
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken);
+
+      const user = await this.userRepo.findOne(decoded.id);
+
+      if (!user || user.refresh_token !== refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const payload = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.created_at,
+      };
+
+      const newAccessToken = this.jwtService.sign(payload, {
+        expiresIn: '15m',
+      });
+
+      // Update the refresh token in the database (optional)
+      user.refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
+      await this.userRepo.save(user);
+
+      return newAccessToken;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }
+
+// 1. accessToken 만료시 DB에 저장된 refreshtoken을 이용해 갱신
+// > accessToken를 쿠키에 저장하여 전송
+// > refreshToken을 db에 저장 -> 재 로그인시 refreshtoken 업데이트

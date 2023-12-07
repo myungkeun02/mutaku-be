@@ -24,5 +24,4 @@ export class jwtServiceStrategy extends PassportStrategy(
       createdAt: payload.createdAt,
     };
   }
-  3;
 }
